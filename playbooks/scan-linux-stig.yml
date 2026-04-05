@@ -78,42 +78,42 @@
           STDERR:
           {{ oscap_run.stderr | default('') }}
 
-- name: Collect scan artifacts to control node
-  hosts: azure_webservers
-  become: false
-  gather_facts: false
-
-  vars:
-    scap_workdir: /var/tmp/scap
-    scap_results_file: "{{ scap_workdir }}/results.xml"
-    scap_report_file: "{{ scap_workdir }}/report.html"
-    scap_console_file: "{{ scap_workdir }}/oscap-console.txt"
-
-    local_artifact_root: /tmp/artifacts
-    scan_timestamp: manual-run
-
-  tasks:
-    - name: Create local artifact directory
-      ansible.builtin.file:
-        path: "{{ local_artifact_root }}/{{ inventory_hostname }}/{{ scan_timestamp }}"
-        state: directory
-        mode: "0755"
-      delegate_to: localhost
-
-    - name: Fetch XML results
-      ansible.builtin.fetch:
-        src: "{{ scap_results_file }}"
-        dest: "{{ local_artifact_root }}/{{ inventory_hostname }}/{{ scan_timestamp }}/results.xml"
-        flat: true
-
-    - name: Fetch HTML report
-      ansible.builtin.fetch:
-        src: "{{ scap_report_file }}"
-        dest: "{{ local_artifact_root }}/{{ inventory_hostname }}/{{ scan_timestamp }}/report.html"
-        flat: true
-
-    - name: Fetch console output
-      ansible.builtin.fetch:
-        src: "{{ scap_console_file }}"
-        dest: "{{ local_artifact_root }}/{{ inventory_hostname }}/{{ scan_timestamp }}/oscap-console.txt"
-        flat: true
+#- name: Collect scan artifacts to control node
+#  hosts: azure_webservers
+#  become: false
+#  gather_facts: false
+#
+ # vars:
+ #   scap_workdir: /var/tmp/scap
+  #  scap_results_file: "{{ scap_workdir }}/results.xml"
+   # scap_report_file: "{{ scap_workdir }}/report.html"
+   # scap_console_file: "{{ scap_workdir }}/oscap-console.txt"
+#
+ #   local_artifact_root: /tmp/artifacts
+  #  scan_timestamp: manual-run
+#
+ # tasks:
+  #  - name: Create local artifact directory
+   #   ansible.builtin.file:
+    #   path: "{{ local_artifact_root }}/{{ inventory_hostname }}/{{ scan_timestamp }}"
+     #   state: directory
+      #  mode: "0755"
+     # delegate_to: localhost
+#
+ #   - name: Fetch XML results
+  #    ansible.builtin.fetch:
+   #     src: "{{ scap_results_file }}"
+    #    dest: "{{ local_artifact_root }}/{{ inventory_hostname }}/{{ scan_timestamp }}/results.xml"
+     #   flat: true
+#
+ #   - name: Fetch HTML report
+  #    ansible.builtin.fetch:
+   #     src: "{{ scap_report_file }}"
+    #    dest: "{{ local_artifact_root }}/{{ inventory_hostname }}/{{ scan_timestamp }}/report.html"
+     #   flat: true
+#
+ #   - name: Fetch console output
+  #    ansible.builtin.fetch:
+   #     src: "{{ scap_console_file }}"
+    #    dest: "{{ local_artifact_root }}/{{ inventory_hostname }}/{{ scan_timestamp }}/oscap-console.txt"
+     #   flat: true
