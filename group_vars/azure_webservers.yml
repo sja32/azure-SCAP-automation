@@ -1,0 +1,10 @@
+scap_workdir: /var/tmp/scap
+scap_results_file: "{{ scap_workdir }}/results.xml"
+scap_report_file: "{{ scap_workdir }}/report.html"
+scap_console_file: "{{ scap_workdir }}/oscap-console.txt"
+
+scap_profile: xccdf_org.ssgproject.content_profile_stig
+scap_datastream: /usr/share/xml/scap/ssg/content/ssg-ubuntu2404-ds.xml
+
+local_artifact_root: "{{ playbook_dir }}/../artifacts"
+scan_timestamp: "manual-run"

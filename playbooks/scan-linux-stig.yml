@@ -1,0 +1,98 @@
+---
+- name: Install OpenSCAP and run STIG scan on Azure Linux VMs
+  hosts: azure_webservers
+  become: true
+  gather_facts: true
+
+  tasks:
+    - name: Ensure SCAP working directory exists
+      ansible.builtin.file:
+        path: "{{ scap_workdir }}"
+        state: directory
+        mode: "0750"
+
+    - name: Install OpenSCAP packages on Ubuntu/Debian
+      ansible.builtin.apt:
+        name:
+          - openscap-scanner
+          - ssg-base
+        state: present
+        update_cache: true
+      when: ansible_facts['os_family'] == "Debian"
+
+    - name: Install OpenSCAP packages on RHEL-family
+      ansible.builtin.package:
+        name:
+          - openscap-scanner
+          - scap-security-guide
+        state: present
+      when: ansible_facts['os_family'] == "RedHat"
+
+    - name: Verify SCAP datastream exists
+      ansible.builtin.stat:
+        path: "{{ scap_datastream }}"
+      register: scap_ds
+
+    - name: Fail if datastream is missing
+      ansible.builtin.fail:
+        msg: "SCAP datastream not found at {{ scap_datastream }}"
+      when: not scap_ds.stat.exists
+
+    - name: Run OpenSCAP STIG scan
+      ansible.builtin.command: >
+        oscap xccdf eval
+        --profile {{ scap_profile }}
+        --results {{ scap_results_file }}
+        --report {{ scap_report_file }}
+        {{ scap_datastream }}
+      register: oscap_run
+      changed_when: false
+      failed_when: oscap_run.rc not in [0, 2]
+
+    - name: Save OpenSCAP console output
+      ansible.builtin.copy:
+        dest: "{{ scap_console_file }}"
+        mode: "0640"
+        content: |
+          COMMAND:
+          oscap xccdf eval --profile {{ scap_profile }} --results {{ scap_results_file }} --report {{ scap_report_file }} {{ scap_datastream }}
+
+          RETURN CODE:
+          {{ oscap_run.rc }}
+
+          STDOUT:
+          {{ oscap_run.stdout | default('') }}
+
+          STDERR:
+          {{ oscap_run.stderr | default('') }}
+
+- name: Collect scan artifacts to control node
+  hosts: azure_webservers
+  become: false
+  gather_facts: false
+
+  tasks:
+    - name: Create local artifact directory
+      ansible.builtin.file:
+        path: "{{ local_artifact_root }}/{{ inventory_hostname }}/{{ scan_timestamp }}"
+        state: directory
+        mode: "0755"
+      delegate_to: localhost
+
+    - name: Fetch XML results
+      ansible.builtin.fetch:
+        src: "{{ scap_results_file }}"
+        dest: "{{ local_artifact_root }}/{{ inventory_hostname }}/{{ scan_timestamp }}/results.xml"
+        flat: true
+
+    - name: Fetch HTML report
+      ansible.builtin.fetch:
+        src: "{{ scap_report_file }}"
+        dest: "{{ local_artifact_root }}/{{ inventory_hostname }}/{{ scan_timestamp }}/report.html"
+        flat: true
+
+    - name: Fetch console output
+      ansible.builtin.fetch:
+        src: "{{ scap_console_file }}"
+        dest: "{{ local_artifact_root }}/{{ inventory_hostname }}/{{ scan_timestamp }}/oscap-console.txt"
+        flat: true
