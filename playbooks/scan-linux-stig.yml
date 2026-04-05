@@ -11,7 +11,7 @@
     scap_console_file: "{{ scap_workdir }}/oscap-console.txt"
 
     scap_profile: xccdf_org.ssgproject.content_profile_stig
-    scap_datastream: /usr/share/xml/scap/ssg/content/ssg-ubuntu2404-ds.xml
+    scap_datastream: /usr/share/xml/scap/ssg/content/ssg-ubuntu2204-ds.xml
 
     local_artifact_root: /tmp/artifacts
     scan_timestamp: manual-run
