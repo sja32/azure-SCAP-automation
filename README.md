@@ -48,3 +48,86 @@ The goal is to simulate a real-world enterprise process for assessing, remediati
 ---
 
 ## 📂 Project Structure
+
+azure-SCAP-automation/
+├── inventory/
+├── group_vars/
+├── playbooks/
+├── roles/
+├── artifacts/
+├── docs/
+├── scripts/
+└── README.md
+
+---
+
+## ⚙️ Getting Started
+
+### Clone repo
+
+git clone git@github.com
+:sja32/azure-SCAP-automation.git
+
+
+### Run scan
+
+ansible-playbook -i inventory/inventory.ini playbooks/scan-linux-stig.yml
+
+
+### Run remediation
+
+ansible-playbook -i inventory/inventory.ini playbooks/remediate-linux-baseline.yml
+
+
+---
+
+## 📊 Output
+
+Artifacts generated:
+
+- results.xml  
+- report.html  
+- oscap-console.txt  
+
+---
+
+## 🔐 Security Considerations
+
+- Verify SSH key authentication before disabling passwords  
+- Restrict SSH access to trusted IPs  
+- Validate firewall rules before enabling  
+
+---
+
+## 📘 Lessons Learned
+
+- SCAP results can be imported into STIG Viewer  
+- Not all controls map perfectly  
+- Automation reduces manual effort  
+
+---
+
+## 🔮 Future Enhancements
+
+- Role-based Ansible design  
+- Scheduled scans  
+- Azure Policy integration  
+- NGINX hardening validation  
+
+---
+
+## 👤 Author
+
+Sharod Allen  
+Information Systems Security Engineer (ISSE)
+
+---
+
+## 📌 Summary
+
+This project demonstrates:
+
+- Automated compliance scanning  
+- Security baseline enforcement  
+- Cloud security integration  
+- Audit-ready artifact generation  
